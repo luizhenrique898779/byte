@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Tradutor Binário</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+      color: #f0f0f0;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #00ffcc;
+      text-shadow: 0 0 10px #00ffcc;
+    }
+    h2 {
+      margin-top: 30px;
+      color: #ffcc00;
+      text-shadow: 0 0 5px #ffcc00;
+    }
+    select, input, button {
+      padding: 10px;
+      margin: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+    input, select {
+      background: #333;
+      color: #fff;
+    }
+    button {
+      background: #00ffcc;
+      color: #000;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+    }
+    button:hover {
+      transform: scale(1.1);
+      background: #00ffaa;
+    }
+    .bits {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .lampada {
+      width: 40px;
+      height: 60px;
+      margin: 8px;
+      border-radius: 20px 20px 10px 10px;
+      background: #222;
+      position: relative;
+      box-shadow: inset 0 0 10px #000;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .lampada::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 10px;
+      background: #555;
+      border-radius: 3px;
+    }
+    .on {
+      background: #ffeb3b;
+      box-shadow: 0 0 20px #ffeb3b, 0 0 40px #ffeb3b;
+    }
+    p {
+      font-size: 18px;
+      margin-top: 10px;
+    }
+    #infoBits {
+      margin-top: 10px;
+      font-size: 16px;
+      color: #00ffaa;
+    }
+  </style>
+</head>
+<body>
+  <h1>💡 Tradutor Binário Interativo</h1>
+  
+  <label for="bits">Escolha número de bits:</label>
+  <select id="bits" onchange="atualizarInfoBits()">
+    <option value="4">4</option>
+    <option value="5" selected>5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+  </select>
+  <div id="infoBits"></div>
+  
+  <h2>Número → Binário</h2>
+  <input type="number" id="numero" placeholder="Digite um número">
+  <button onclick="numeroParaBinario()">Converter</button>
+  <p id="binario"></p>
+  <div id="luzes" class="bits"></div>
+  
+  <h2>Binário → Número</h2>
+  <input type="text" id="binarioInput" placeholder="Digite binário ex: 00010">
+  <button onclick="binarioParaNumero()">Converter</button>
+  <p id="numeroResultado"></p>
+  
+  <script>
+    function atualizarInfoBits() {
+      const bits = parseInt(document.getElementById("bits").value);
+      const max = Math.pow(2, bits) - 1;
+      document.getElementById("infoBits").textContent = 
+        "Com " + bits + " bits: números de 0 até " + max + " | binário com " + bits + " dígitos.";
+    }
+
+    function numeroParaBinario() {
+      const bits = parseInt(document.getElementById("bits").value);
+      const numero = parseInt(document.getElementById("numero").value);
+      if (isNaN(numero)) return;
+
+      const max = Math.pow(2, bits) - 1;
+      if (numero > max) {
+        alert("Número excede o limite para " + bits + " bits (máx = " + max + ")");
+        return;
+      }
+
+      let bin = numero.toString(2).padStart(bits, "0");
+      document.getElementById("binario").textContent = "Binário: " + bin;
+      mostrarLuzes(bin);
+    }
+
+    function binarioParaNumero() {
+      const bits = parseInt(document.getElementById("bits").value);
+      const bin = document.getElementById("binarioInput").value;
+
+      if (bin.length !== bits || !/^[01]+$/.test(bin)) {
+        alert("Digite exatamente " + bits + " dígitos binários (0 ou 1)");
+        return;
+      }
+
+      const numero = parseInt(bin, 2);
+      document.getElementById("numeroResultado").textContent = "Número: " + numero;
+      mostrarLuzes(bin);
+    }
+
+    function mostrarLuzes(bin) {
+      const container = document.getElementById("luzes");
+      container.innerHTML = "";
+      for (let bit of bin) {
+        const div = document.createElement("div");
+        div.classList.add("lampada");
+        if (bit === "1") div.classList.add("on");
+        container.appendChild(div);
+      }
+    }
+
+    // Atalho: apertar Enter também converte
+    document.getElementById("numero").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") numeroParaBinario();
+    });
+    document.getElementById("binarioInput").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") binarioParaNumero();
+    });
+
+    // Inicializa info
+    atualizarInfoBits();
+  </script>
+</body>
+</html>
